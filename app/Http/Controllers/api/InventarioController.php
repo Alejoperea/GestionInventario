@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\api;
-
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\Inventario;
 use Illuminate\Http\Request;
 
 class InventarioController extends Controller
@@ -13,6 +14,8 @@ class InventarioController extends Controller
     public function index()
     {
         //
+        $inventarios = Inventario::all();
+        return json_encode( ['inventarios' => $inventarios]);
     }
 
     /**
@@ -21,6 +24,14 @@ class InventarioController extends Controller
     public function store(Request $request)
     {
         //
+        $inventario = new Inventario();
+
+        $inventario -> producto_id  = $request -> producto_id ;
+        $inventario -> proveedor_id   = $request -> proveedor_id  ;
+        $inventario -> cantidad = $request-> cantidad;
+        $inventario->save();
+
+        return json_encode(['inventario' => $inventario]);
     }
 
     /**
@@ -29,6 +40,9 @@ class InventarioController extends Controller
     public function show(string $id)
     {
         //
+        $inventario = Inventario::find($id);
+
+        return json_encode(['inventario'=> $inventario]);
     }
 
     /**
@@ -37,6 +51,16 @@ class InventarioController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        $inventario = Inventario::find($id);
+        $inventario -> producto_id = $request -> producto_id;
+        $inventario -> proveedor_id = $request-> proveedor_id;
+        $inventario -> cantidad = $request-> cantidad;
+        $inventario ->  save();
+
+        $inventario = DB::table('inventarios')
+        ->orderBy('nombre')
+        ->get();
+        return json_encode (['inventario' => $inventario]);
     }
 
     /**
@@ -45,5 +69,13 @@ class InventarioController extends Controller
     public function destroy(string $id)
     {
         //
+        $inventario = Inventario::find($id);
+        $inventario->delete();
+
+        $inventario = DB::table('inventarios')
+        ->orderBy('nombre')
+        ->get();
+
+        return json_encode (['inventario' => $inventario]);
     }
 }
