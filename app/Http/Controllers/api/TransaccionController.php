@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\api;
-
+use App\Models\Transaccion;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,8 @@ class TransaccionController extends Controller
     public function index()
     {
         //
+        $transacciones = Transaccion::all();
+        return json_encode( ['transacciones' => $transacciones]);
     }
 
     /**
@@ -21,6 +24,15 @@ class TransaccionController extends Controller
     public function store(Request $request)
     {
         //
+        $transaccion = new Transaccion();
+
+        $transaccion -> tipo = $request -> tipo;
+        $transaccion -> producto_id  = $request -> producto_id ;
+        $transaccion -> cantidad  = $request -> cantidad ;
+        $transaccion -> fecha = $request-> fecha;
+        $transaccion->save();
+
+        return json_encode(['transaccion' => $transaccion]);
     }
 
     /**
@@ -29,6 +41,9 @@ class TransaccionController extends Controller
     public function show(string $id)
     {
         //
+        $transaccion = Transaccion::find($id);
+
+        return json_encode(['transaccion'=> $transaccion]);
     }
 
     /**
@@ -37,6 +52,17 @@ class TransaccionController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        $transaccion = Transaccion::find($id);
+        $transaccion -> tipo = $request -> tipo;
+        $transaccion -> producto_id = $request-> producto_id;
+        $transaccion -> cantidad = $request-> cantidad;
+        $transaccion -> fecha = $request-> fecha;
+        $transaccion ->  save();
+
+        $transaccion = DB::table('transacciones')
+        ->orderBy('nombre')
+        ->get();
+        return json_encode (['transaccion' => $transaccion]);
     }
 
     /**
@@ -45,5 +71,13 @@ class TransaccionController extends Controller
     public function destroy(string $id)
     {
         //
+        $transaccion = Transaccion::find($id);
+        $transaccion->delete();
+
+        $transaccion = DB::table('transacciones')
+        ->orderBy('nombre')
+        ->get();
+
+        return json_encode (['transaccion' => $transaccion]);
     }
 }

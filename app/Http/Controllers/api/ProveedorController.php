@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\api;
-
+use App\Models\Proveedor;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class ProveedorController extends Controller
@@ -13,6 +14,8 @@ class ProveedorController extends Controller
     public function index()
     {
         //
+        $proveedores = Proveedor::all();
+        return json_encode( ['proveedores' => $proveedores]);
     }
 
     /**
@@ -21,6 +24,13 @@ class ProveedorController extends Controller
     public function store(Request $request)
     {
         //
+        $proveedor = new Proveedor();
+
+        $proveedor -> nombre = $request -> nombre;
+        $proveedor -> contacto = $request-> contacto;
+        $proveedor->save();
+
+        return json_encode(['proveedor' => $proveedor]);
     }
 
     /**
@@ -29,6 +39,9 @@ class ProveedorController extends Controller
     public function show(string $id)
     {
         //
+        $proveedor = Proveedor::find($id);
+
+        return json_encode(['proveedor'=> $proveedor]);
     }
 
     /**
@@ -37,6 +50,15 @@ class ProveedorController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        $proveedor = Proveedor::find($id);
+        $proveedor -> nombre = $request -> nombre;
+        $proveedor -> contacto = $request-> contacto;
+        $proveedor ->  save();
+
+        $proveedor = DB::table('provedores')
+        ->orderBy('nombre')
+        ->get();
+        return json_encode (['proveedor' => $proveedor]);
     }
 
     /**
@@ -45,5 +67,13 @@ class ProveedorController extends Controller
     public function destroy(string $id)
     {
         //
+        $proveedor = Proveedor::find($id);
+        $proveedor->delete();
+
+        $proveedor = DB::table('proveedores')
+        ->orderBy('nombre')
+        ->get();
+
+        return json_encode (['proveedor' => $proveedor]);
     }
 }
