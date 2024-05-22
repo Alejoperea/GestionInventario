@@ -55,7 +55,7 @@ class ProveedorController extends Controller
         $proveedor -> contacto = $request-> contacto;
         $proveedor ->  save();
 
-        $proveedor = DB::table('provedores')
+        $proveedor = DB::table('proveedores')
         ->orderBy('nombre')
         ->get();
         return json_encode (['proveedor' => $proveedor]);
