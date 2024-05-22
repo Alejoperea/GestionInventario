@@ -1,9 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\api;
+
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Inventario;
+use App\Models\Proveedor;
+use App\Models\Producto;
 use Illuminate\Http\Request;
 
 class InventarioController extends Controller
@@ -13,9 +16,14 @@ class InventarioController extends Controller
      */
     public function index()
     {
-        //
-        $inventarios = Inventario::all();
-        return json_encode( ['inventarios' => $inventarios]);
+        // Realizamos un join con las tablas productos y proveedores para obtener los nombres
+        $inventarios = DB::table('inventarios')
+            ->join('productos', 'inventarios.producto_id', '=', 'productos.id')
+            ->join('proveedores', 'inventarios.proveedor_id', '=', 'proveedores.id')
+            ->select('inventarios.*', 'productos.nombre as producto_nombre', 'proveedores.nombre as proveedor_nombre')
+            ->get();
+        
+        return json_encode(['inventarios' => $inventarios], 200);
     }
 
     /**
@@ -23,12 +31,18 @@ class InventarioController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $inventario = new Inventario();
+        // Validamos los datos de entrada
+        $request->validate([
+            'producto_id' => 'required|exists:productos,id',
+            'proveedor_id' => 'required|exists:proveedores,id',
+            'cantidad' => 'required|integer'
+        ]);
 
-        $inventario -> producto_id  = $request -> producto_id ;
-        $inventario -> proveedor_id   = $request -> proveedor_id  ;
-        $inventario -> cantidad = $request-> cantidad;
+        // Creamos un nuevo inventario
+        $inventario = new Inventario();
+        $inventario->producto_id = $request->producto_id;
+        $inventario->proveedor_id = $request->proveedor_id;
+        $inventario->cantidad = $request->cantidad;
         $inventario->save();
 
         return json_encode(['inventario' => $inventario]);
@@ -39,10 +53,15 @@ class InventarioController extends Controller
      */
     public function show(string $id)
     {
-        //
-        $inventario = Inventario::find($id);
+        // Buscamos el inventario por ID y realizamos el join para obtener los nombres
+        $inventario = DB::table('inventarios')
+            ->join('productos', 'inventarios.producto_id', '=', 'productos.id')
+            ->join('proveedores', 'inventarios.proveedor_id', '=', 'proveedores.id')
+            ->select('inventarios.*', 'productos.nombre as producto_nombre', 'proveedores.nombre as proveedor_nombre')
+            ->where('inventarios.id', $id)
+            ->first();
 
-        return json_encode(['inventario'=> $inventario]);
+        return json_encode(['inventario' => $inventario]);
     }
 
     /**
@@ -50,17 +69,23 @@ class InventarioController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
-        $inventario = Inventario::find($id);
-        $inventario -> producto_id = $request -> producto_id;
-        $inventario -> proveedor_id = $request-> proveedor_id;
-        $inventario -> cantidad = $request-> cantidad;
-        $inventario ->  save();
+        // Validamos los datos de entrada
+        $request->validate([
+            'producto_id' => 'required|exists:productos,id',
+            'proveedor_id' => 'required|exists:proveedores,id',
+            'cantidad' => 'required|integer'
+        ]);
 
-        $inventario = DB::table('inventarios')
-        ->orderBy('nombre')
-        ->get();
-        return json_encode (['inventario' => $inventario]);
+        // Actualizamos el inventario existente
+        $inventario = Inventario::find($id);
+        if ($inventario) {
+            $inventario->producto_id = $request->producto_id;
+            $inventario->proveedor_id = $request->proveedor_id;
+            $inventario->cantidad = $request->cantidad;
+            $inventario->save();
+
+            return json_encode(['inventario' => $inventario]);
+        }
     }
 
     /**
@@ -68,13 +93,11 @@ class InventarioController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        // Eliminamos el inventario por ID
         $inventario = Inventario::find($id);
-        $inventario->delete();
-
-        $inventario = DB::table('inventarios')
-        ->orderBy('nombre')
-        ->get();
+        if ($inventario) {
+            $inventario->delete();
+        }
 
         return json_encode (['inventario' => $inventario]);
     }
