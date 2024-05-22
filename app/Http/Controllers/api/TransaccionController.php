@@ -14,8 +14,18 @@ class TransaccionController extends Controller
     public function index()
     {
         //
-        $transacciones = Transaccion::all();
-        return json_encode( ['transacciones' => $transacciones]);
+        // $transacciones = Transaccion::all();
+        // return json_encode( ['transacciones' => $transacciones]);
+
+
+        $transacciones = DB::table('transacciones')
+        ->join('productos', 'transacciones.producto_id', '=', 'productos.id')
+        ->select('transacciones.*', 'productos.nombre as producto_nombre')
+        // ->orderBy('id')
+        ->get();
+       
+        return json_encode(['transacciones' => $transacciones], 200);
+        
     }
 
     /**
@@ -60,7 +70,7 @@ class TransaccionController extends Controller
         $transaccion ->  save();
 
         $transaccion = DB::table('transacciones')
-        ->orderBy('nombre')
+        // ->orderBy('nombre')
         ->get();
         return json_encode (['transaccion' => $transaccion]);
     }

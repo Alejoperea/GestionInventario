@@ -22,11 +22,11 @@ Route::put('/categorias/{categorias}', [CategoriaController::class, 'update'])->
 
 //Rutas de Producto
 
-Route::get('/produtos', [ProductoController::class, 'index'])->name('productos');
+Route::get('/productos', [ProductoController::class, 'index'])->name('productos');
 Route::post('/productos', [ProductoController::class, 'store'])->name('productos.store');
-Route::delete('/productos/{productos}', [ProductoController::class, 'destroy'])->name('productos.destroy');
-Route::get('/productos/{productos}', [ProductoController::class,'show'])->name('productos.show');
-Route::put('/productos/{productos}',[ProductoController::class,'update'])->name('productos.update');
+Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
+Route::get('/productos/{producto}', [ProductoController::class,'show'])->name('productos.show');
+Route::put('/productos/{producto}',[ProductoController::class,'update'])->name('productos.update');
 
 //Rutas de Inventario
 

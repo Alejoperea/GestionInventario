@@ -72,6 +72,6 @@ class CategoriaController extends Controller
         ->orderBy('nombre')
         ->get();
 
-        return json_encode (['categoria' => $categoria]);
+        return json_encode (['categoria' => $categoria,'success' =>true]);
     }
 }

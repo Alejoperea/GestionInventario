@@ -14,12 +14,12 @@ class ProductoController extends Controller
     public function index()
     {
         $productos = DB::table('productos')
-        ->join('categorias', 'productos.category_id', '=', 'categorias.id')
-        ->select('products.*', 'categorias.name as categoria_nombre')
+        ->join('categorias', 'productos.categoria_id', '=', 'categorias.id')
+        ->select('productos.*', 'categorias.nombre as categoria_nombre')
+        ->orderBy('id')
         ->get();
-
        
-             return response()->json(['productos' => $productos], 200);
+        return json_encode(['productos' => $productos], 200);
     }
 
     /**
@@ -35,7 +35,7 @@ class ProductoController extends Controller
         $producto->categoria_id  = $request->categoria_id ;
         $producto->save();
 
-        return json_encode(['productos' => $producto]);
+        return json_encode(['producto' => $producto]);
     }
 
     /**
@@ -65,7 +65,7 @@ class ProductoController extends Controller
         $producto->categoria_id = $request->categoria_id;
         $producto->save();
     
-        return json_encode(['productos'=>$producto]);
+        return json_encode(['producto'=>$producto]);
     }
 
     /**
@@ -77,10 +77,10 @@ class ProductoController extends Controller
         $producto = Producto::find($id);
         $producto->delete();
 
-        $productos = DB::table('productos')
+        $producto = DB::table('productos')
         ->orderBy('nombre')
         ->get();
 
-        return json_encode(['productos' => $productos]);
+        return json_encode(['producto' => $producto]);
     }
 }
